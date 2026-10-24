@@ -1,0 +1,48 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Downloaded data, run artefacts, caches (populated by CLI commands, never committed).
+# The hand-written hard-negative set lives in data_own/ and IS committed.
+/data/
+/models/
+/runs/
+.cache/
+
+# Python / tooling
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# graphify knowledge graph — local only: it embeds content of the local-only planning docs
+graphify-out/
+*.graphify-bak
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Node (not used in this project; guard anyway)
+node_modules/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Agent prompt files (local only; the other planning docs are committed in v2)
+IMPLEMENTATION_PROMPTS.md
+PROMPT_PLAYBOOK.md
+
