@@ -290,11 +290,9 @@ def eval_run(
             )
             config = config.model_copy(update={"variant": variant})
             if no_cache:
+                variant += " (timing, no cache)"
                 config = config.model_copy(
-                    update={
-                        "params": {"no_cache": True},
-                        "variant": variant + " (timing, no cache)",
-                    }
+                    update={"params": {"no_cache": True}, "variant": variant}
                 )
             typer.echo(
                 f"{variant} on {name} ({hn_status if name == 'hard_negative' else 'deepset'})"
@@ -304,9 +302,14 @@ def eval_run(
                 if done % 10 == 0 or done == total:
                     typer.echo(f"  {done}/{total}")
 
-            summary = runner.run(
-                det, cases, config, RUNS_DIR, dataset_revision=_revision(), on_progress=progress
-            )
+            try:
+                summary = runner.run(
+                    det, cases, config, RUNS_DIR, dataset_revision=_revision(), on_progress=progress
+                )
+            finally:
+                close = getattr(det, "close", None)
+                if callable(close):
+                    close()  # the judge owns an event loop
             m = summary["metrics"]
             typer.echo(
                 f"  run {summary['run_id']}: recall={m['recall']['value']} fpr={m['fpr']['value']} "

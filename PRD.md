@@ -72,7 +72,7 @@ report CIs and say so.
 |---|---|
 | FR-1 | `cli data prepare`: deepset download, language tag (en/de), validation carved from train (stratified, seed 42). |
 | FR-2 | Hard-negative set in `data_own/hard_negatives.jsonl` with category, author, notes; validator + category coverage report. |
-| FR-3 | A: regex/keyword rules ("ignore previous", "you are now", base64 blobs, role-play markers) with per-rule hit logging. |
+| FR-3 | A: regex/keyword rules (25 rules in v2, English/German/Spanish) ("ignore previous", "you are now", base64 blobs, role-play markers) with per-rule hit logging. |
 | FR-4 | B: Llama Prompt Guard 2 (86M) run locally on CPU with `transformers` (revision pinned); score + label. No API. |
 | FR-5 | C: DeBERTa-v3-small (or DistilBERT) fine-tuned on deepset train on Kaggle; pushed to the Hub; CPU inference. |
 | FR-6 | D: LLM judge behind the role `judge`: local Ollama `qwen3:4b-instruct` during the build, Groq `gpt-oss-20b` for the benchmark rows and the Space (TRD §S10); short classification prompt; structured verdict. |

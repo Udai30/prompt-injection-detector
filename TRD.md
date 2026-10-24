@@ -60,6 +60,14 @@ measures it) → one run over validation + test + hard negatives fits an evening
 **Hosted budget (benchmark, MB.1).** D at ~400 tokens per check ≈ 130K tokens — one Groq day,
 in the background after the build-complete checkpoint.
 
+**Implementation notes (2026-10-24).**
+- B currently runs on the ungated stand-in `protectai/deberta-v3-base-prompt-injection-v2` (revision pinned in `detectors/hf_classifier.py`) until the human accepts the Prompt Guard 2 licence; the variant name in every results row says which model ran.
+- Detector A's rules are versioned (`configs/rules.yaml`, v2); v2 changes were made from validation misses only.
+- New CLI: `eval run [--no-cache]`, `report build|sweep`, `failures`, `import-predictions`, `models download`, `hn validate|coverage`. `--no-cache` is for latency timing and labels the run "(timing, no cache)".
+- Only the P01 LLM layer was ported; the eval runner was written fresh because P01's is receipt-specific.
+- Dependencies: `pillow>=13` override (Gradio caps it below 13; same decision as P01); `filelock` CVEs in pip-audit cannot be fixed while `litellm` caps `filelock<4` (accepted, local cache locking only).
+- Demo: per-UTC-day cap on live judge checks (`DEMO_DAILY_REQUESTS`) when `DEMO_MODE=true`.
+
 ## 4. Components
 
 ### 4.1 Detector protocol

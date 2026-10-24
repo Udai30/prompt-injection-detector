@@ -16,6 +16,7 @@ dependencies = [
     "matplotlib>=3.10",
     "numpy>=2.5.4",
     "pandas>=2.3",
+    "pillow>=13.0.0",
     "pyarrow>=21",
     "pydantic>=2.8",
     "pydantic-settings>=2.4",
@@ -49,6 +50,13 @@ dev = [
     "ruff>=0.17.1",
     "types-pyyaml>=6.0.12.20260906",
 ]
+
+[tool.uv]
+# Every Gradio release caps pillow below 13, but pillow < 13.0 has known CVEs on the image-decoding
+# path (pip-audit 2026-10-24: CVE-2026-96636..96644, 96778, 112398, 114501, GHSA-78g4-xqwv-q3g8).
+# Same decision as P01 (2026-10-23): keep pillow 13 over Gradio's cap. This app never decodes
+# user images. Remove when Gradio allows pillow >= 13.
+override-dependencies = ["pillow>=13.0.0"]
 
 [tool.ruff]
 line-length = 100

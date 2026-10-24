@@ -38,6 +38,9 @@ Project documentation: [PRD.md](PRD.md) · [TRD.md](TRD.md) · [APPFLOW.md](APPF
 ## 2. Files
 
 - `data/deepset/splits.json` — train', validation, test ids + language tags.
+- `data/c_scores/predictions.jsonl` — raw C scores copied by `import-predictions` (gitignored).
+- `reports/operating_point.json`, `reports/failures.csv`, `reports/failure_notes.md`, `reports/recall_vs_fpr.png` — written by `report sweep` / `failures`.
+- `runs/llm_calls.jsonl` — one LLM call log shared by all D runs (the TRD's per-run file was not kept).
 - `reports/threshold_sweep.csv` — `threshold, recall, fpr, precision` for C on validation and test.
 - Hub: `<hf-user>/injection-detector-deberta-small` (model), `<hf-user>/prompt-injection-hard-negatives` (dataset).
 
@@ -61,7 +64,7 @@ Project documentation: [PRD.md](PRD.md) · [TRD.md](TRD.md) · [APPFLOW.md](APPF
 | prediction | object | project-specific (§1) |
 | gold | object | project-specific (§1) |
 | details | object | sub-metrics, evidence ids, retries |
-| latency_ms | int | wall clock for the case |
+| latency_ms | float \| null | wall clock for the case in ms (3 dp); null for rows imported from Kaggle (not measured) |
 | tokens_in / tokens_out | int | summed over the case's LLM calls |
 | list_cost_usd | str (Decimal) | |
 
@@ -70,7 +73,7 @@ Project documentation: [PRD.md](PRD.md) · [TRD.md](TRD.md) · [APPFLOW.md](APPF
 schema_valid (null if no schema), list_price_usd, actual_cost_usd, error (null on success), ts`.
 
 ### `summary.json`
-`run_id, variant, dataset_split, sample_size, metrics{name: {value, ci_low, ci_high}},
+`run_id, detector, variant, dataset_split, hn_status (final\|draft\|n/a), threshold, sample_size, metrics{n, n_attacks, n_benign, recall\|fpr\|precision\|f1: {value, ci_low, ci_high}} (value null when undefined, e.g. recall on the all-benign hard negatives), by_language{en\|de\|other: same block},
 latency_ms{p50, p95, p99?}, tokens{in, out}, list_cost_usd_per_1k, n_errors, started_at, finished_at`.
 
 ### `manifest.json`

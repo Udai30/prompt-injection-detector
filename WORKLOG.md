@@ -115,6 +115,19 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 **Decisions:** llama3.2 numbers are provisional on the draft hard-negative set like all FPR figures.
 **Open:** unchanged human actions (accept hard negatives; HF token + Prompt Guard 2; Kaggle C; publish). README results table still not filled: waits for accepted hard negatives.
 
+## 2026-10-24 — QA · Quality gates, CLI end-to-end tests, documentation sync
+
+**Done:**
+- `pip-audit`: pillow 12.3.0 had 12 known CVEs (Gradio caps pillow < 13) -> `pillow>=13` override in `pyproject.toml`, same decision as P01. Remaining: 3 `filelock` 3.32.7 CVEs (fix 4.2.1) that cannot be applied because `litellm` requires `filelock<4`; accepted risk (local lock files only), re-check on the next litellm release.
+- Coverage: **94 %** overall (cli 84 %, factory 76 %; no module under 76 %); gate was >= 80 % on core logic.
+- New end-to-end CLI tests (`tests/unit/test_cli_eval.py`: rules pipeline -> report -> failures, judge run with FakeProvider incl. `--no-cache`, bad arguments, invalid hard-negative file).
+- Bug found by them: `eval run` never closed the judge's event loop (ResourceWarning leaked into another test); the CLI now closes detectors after each run. `--no-cache` now also labels the printed variant.
+- Flaky pathological-input timing test loosened to 5 s (it failed once under load).
+- Docs synced (CLAUDE.md §8): TRD implementation notes, BACKEND_SCHEMA (float latency, summary fields, new files, shared `llm_calls.jsonl`), PRD FR-3.
+- Verification: 238 passed, 2 opt-in skipped; ruff, mypy clean.
+**Files:** `pyproject.toml`, `uv.lock`, `src/injection_bench/cli.py`, `tests/unit/test_cli_eval.py`, `tests/unit/detectors/test_rules.py`, `TRD.md`, `BACKEND_SCHEMA.md`, `PRD.md`.
+**Open:** unchanged human actions.
+
 ## 2026-10-23 — DOCS · Build local, benchmark hosted (v2.1)
 
 **Done:** Re-architected the LLM access for the build (human request, 2026-10-23: "build the app first

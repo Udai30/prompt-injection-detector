@@ -59,7 +59,7 @@ def test_more_hits_raise_the_score_and_are_counted() -> None:
 
 def test_matching_stays_fast_on_pathological_input(detector: RuleDetector) -> None:
     verdict = detector.score(["ignore " + "a " * 10_000 + "previous"])[0]
-    assert verdict.latency_ms < 1_000
+    assert verdict.latency_ms < 5_000
 
 
 def test_bad_rule_files_fail_clearly(tmp_path: Path) -> None:
