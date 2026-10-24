@@ -32,7 +32,7 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 
 | Item | Value |
 |---|---|
-| Current task | M1.2 — in progress |
+| Current task | M1.3 — in progress |
 | Last verified gate run | — |
 | Pending human actions | see the entries below |
 
@@ -59,6 +59,17 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 **Files:** `src/injection_bench/{core/types.py,data/deepset.py,cli.py,config.py}`, `tests/unit/data/test_deepset.py`, `.env.example`.
 **Decisions:** Language tags come from lingua restricted to six Latin-script languages; anything not en/de is `other`. The test split is small (116): every later number carries a bootstrap CI.
 **Open:** Human action (optional): set `HF_TOKEN` in `.env` for faster downloads.
+
+## 2026-10-24 — M1.2 · Hard-negative set: schema, tooling and the first 150 prompts
+
+**Done:** `data/hard_negatives.py` (Pydantic schema, validator: schema/length/category/duplicate id and text with case/accent/punctuation-insensitive matching, author rule), coverage report, `to_cases`, `resolve_path` (human-accepted file wins, else the draft). CLI `hn validate` and `hn coverage --write`. Agent-drafted **160 candidates** (8 categories × 20) in `data_own/hard_negatives.draft.jsonl` (`author: claude-draft`); coverage report `reports/hn_coverage.md`; dataset card draft `data_own/README.md` (CC-BY-4.0).
+- Verification: 10 new tests (schema errors with line numbers, duplicates, authors, coverage, CLI, committed draft is valid and covers every category); ruff + mypy clean.
+**Files:** `src/injection_bench/data/hard_negatives.py`, `src/injection_bench/cli.py`, `tests/unit/data/test_hard_negatives.py`, `data_own/*`, `reports/hn_coverage.md`.
+**Decisions:**
+- The agent never writes `hard_negatives.jsonl`. Detector runs fall back to the draft when the final file is absent, and every run record carries `hn_status: draft|final`; **no README number may come from a draft-status run** (CLAUDE.md §5).
+- Console output stays ASCII (Windows cp1252 consoles crash on `≥`).
+**Open:**
+- **Human action (the slow, valuable part):** read `data_own/hard_negatives.draft.jsonl`; reject, edit and add rows; move accepted rows into `data_own/hard_negatives.jsonl` with `author: udai`; run `uv run injection_bench hn validate` and `hn coverage`. M1.2 is not "done" until >= 150 human-accepted prompts exist. Until then all hard-negative FPR numbers are provisional.
 
 ## 2026-10-23 — DOCS · Build local, benchmark hosted (v2.1)
 

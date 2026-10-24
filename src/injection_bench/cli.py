@@ -7,6 +7,7 @@ works without a ``.env`` file.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any
 
 import typer
@@ -31,6 +32,11 @@ app.add_typer(llm_app, name="llm")
 
 data_app = typer.Typer(help="Download and inspect the deepset splits.", no_args_is_help=True)
 app.add_typer(data_app, name="data")
+
+hn_app = typer.Typer(help="Hard-negative set: validate and report coverage.", no_args_is_help=True)
+app.add_typer(hn_app, name="hn")
+
+HN_DIR = Path("data_own")
 
 PING_PROMPT = "Reply with exactly one word: pong"
 PING_MAX_TOKENS = 256
@@ -145,6 +151,52 @@ def data_stats() -> None:
         typer.echo(
             f"{row['split']:<11} {row['language']:<6} {row['benign']:>6} {row['injection']:>9}"
         )
+
+
+def _hn_records(directory: Path) -> tuple[list[Any], bool, list[str]]:
+    from injection_bench.data import hard_negatives as hn  # noqa: PLC0415
+
+    path, final = hn.resolve_path(directory)
+    if not path.exists():
+        typer.echo(f"error: {path} not found", err=True)
+        raise typer.Exit(code=1)
+    records, problems = hn.load(path)
+    return records, final, problems + hn.validate(records, final=final)
+
+
+@hn_app.command("validate")
+def hn_validate(
+    directory: Annotated[Path, typer.Option("--dir", help="Folder with the JSONL files.")] = HN_DIR,
+) -> None:
+    """Check schema, lengths, categories, duplicates and authors (final file: author udai)."""
+    records, final, problems = _hn_records(directory)
+    typer.echo(f"{'final' if final else 'DRAFT'} set: {len(records)} prompts")
+    for problem in problems:
+        typer.echo(f"  problem: {problem}", err=True)
+    if problems:
+        raise typer.Exit(code=1)
+    typer.echo("ok")
+
+
+@hn_app.command("coverage")
+def hn_coverage(
+    directory: Annotated[Path, typer.Option("--dir", help="Folder with the JSONL files.")] = HN_DIR,
+    write: Annotated[
+        Path | None, typer.Option("--write", help="Also write the report to this markdown file.")
+    ] = None,
+) -> None:
+    """Prompts per category against the target of 15."""
+    from injection_bench.data import hard_negatives as hn  # noqa: PLC0415
+
+    records, final, problems = _hn_records(directory)
+    if problems:
+        typer.echo(f"error: {len(problems)} validation problem(s); run `hn validate`", err=True)
+        raise typer.Exit(code=1)
+    report = hn.coverage_markdown(records, final=final)
+    typer.echo(report)
+    if write is not None:
+        write.parent.mkdir(parents=True, exist_ok=True)
+        write.write_text(report, encoding="utf-8", newline="\n")
 
 
 def main() -> None:
