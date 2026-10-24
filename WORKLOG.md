@@ -32,7 +32,7 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 
 | Item | Value |
 |---|---|
-| Current task | M1.1 — in progress |
+| Current task | M1.2 — in progress |
 | Last verified gate run | — |
 | Pending human actions | see the entries below |
 
@@ -50,6 +50,15 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 - `torch` / `transformers` are an optional extra (`uv sync --extra models`) so the base install stays light; B and C need them.
 - CLAUDE.md §1 updated: the human now allows commit + push on `test` only (same rule as P07).
 **Open:** Human action: `ollama pull` tags already present; HF token + Prompt Guard 2 licence before M1.3's B runs.
+
+## 2026-10-24 — M1.1 · deepset download, language tags and splits
+
+**Done:** `data prepare` downloads `deepset/prompt-injections` at pinned revision `4f61ecb0…` (licence **apache-2.0** confirmed from the dataset card), tags language with `lingua` (en / de / other), carves validation (15 %, stratified by label, seed 42) from the original train split and writes `data/deepset/{train,validation,test}.jsonl` + `splits.json` (ids, ids_hash, language tags). `data stats` prints label balance by language and split. Domain contracts (`Case`, `Verdict`, `Detector` protocol) added in `core/types.py`.
+- Split sizes: 546 original train → **465 train' + 81 validation**; **116 test** (matches the spec). Test: en 29 benign / 37 injection, de 27 / 21, other 0 / 2. Validation: en 23/15, de 28/12, other 0/3. `other` (French etc.) is reported on its own line, never merged into en/de.
+- Verification: 6 new unit tests (stratified + seeded carve, disjoint splits, stable ids_hash, stats, errors, lingua en/de) offline; real download run once; ruff + mypy clean.
+**Files:** `src/injection_bench/{core/types.py,data/deepset.py,cli.py,config.py}`, `tests/unit/data/test_deepset.py`, `.env.example`.
+**Decisions:** Language tags come from lingua restricted to six Latin-script languages; anything not en/de is `other`. The test split is small (116): every later number carries a bootstrap CI.
+**Open:** Human action (optional): set `HF_TOKEN` in `.env` for faster downloads.
 
 ## 2026-10-23 — DOCS · Build local, benchmark hosted (v2.1)
 

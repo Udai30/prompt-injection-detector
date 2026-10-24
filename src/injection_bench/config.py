@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     llm_max_concurrency: int = Field(default=4, ge=1, le=64)
     llm_timeout_s: float = Field(default=60.0, gt=0, le=600)
 
+    # Downloaded datasets and model weights (gitignored; filled by explicit CLI commands).
+    data_dir: Path = Path("data")
+
     # Local services
     ollama_base_url: AnyHttpUrl = AnyHttpUrl("http://localhost:11434")
 

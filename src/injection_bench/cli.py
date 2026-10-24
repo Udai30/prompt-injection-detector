@@ -29,6 +29,9 @@ llm_app = typer.Typer(
 )
 app.add_typer(llm_app, name="llm")
 
+data_app = typer.Typer(help="Download and inspect the deepset splits.", no_args_is_help=True)
+app.add_typer(data_app, name="data")
+
 PING_PROMPT = "Reply with exactly one word: pong"
 PING_MAX_TOKENS = 256
 DEFAULT_ROLE = "judge"
@@ -106,6 +109,42 @@ def llm_ping(
     ]
     for label, value in rows:
         typer.echo(f"{label:<12} {value}")
+
+
+@data_app.command("prepare")
+def data_prepare() -> None:
+    """Download deepset/prompt-injections (pinned revision), tag language, write the splits."""
+    from injection_bench.config import ConfigError, get_settings  # noqa: PLC0415
+    from injection_bench.data import deepset  # noqa: PLC0415
+
+    try:
+        data_dir = get_settings().data_dir
+    except ConfigError as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(code=1) from None
+    manifest = deepset.prepare(data_dir, deepset.hf_downloader(data_dir), deepset.lingua_tagger())
+    typer.echo(f"{manifest['dataset']} @ {manifest['revision'][:8]}  licence {manifest['license']}")
+    for split, info in manifest["splits"].items():
+        typer.echo(f"{split:<11} n={info['n']:<4} ids_hash={info['ids_hash']}")
+    typer.echo(f"written to {data_dir / 'deepset'}")
+
+
+@data_app.command("stats")
+def data_stats() -> None:
+    """Label balance by language and split."""
+    from injection_bench.config import ConfigError, get_settings  # noqa: PLC0415
+    from injection_bench.data import deepset  # noqa: PLC0415
+
+    try:
+        rows = deepset.stats(get_settings().data_dir)
+    except (ConfigError, FileNotFoundError) as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo(f"{'split':<11} {'lang':<6} {'benign':>6} {'injection':>9}")
+    for row in rows:
+        typer.echo(
+            f"{row['split']:<11} {row['language']:<6} {row['benign']:>6} {row['injection']:>9}"
+        )
 
 
 def main() -> None:
