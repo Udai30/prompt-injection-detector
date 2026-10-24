@@ -32,11 +32,24 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 
 | Item | Value |
 |---|---|
-| Current task | M0.1 — not started |
+| Current task | M1.1 — in progress |
 | Last verified gate run | — |
 | Pending human actions | see the entries below |
 
 ---
+
+## 2026-10-24 — M0.1 · Port the lean foundation from P01
+
+**Done:** Git set up (human request): own repo, remote `Udai30/prompt-injection-detector`, branches `main` (default), `dev`, `test`; initial commit pushed on all three, all later work committed/pushed on `test` only. Ported P01's `llm/` provider layer and `config.py` (package renamed `injection_bench`), added `profiles:` + `ModelRegistry.resolve(role, profile)` and `LLM_PROFILE` (default `local`), trimmed `configs/models.yaml` to `ollama-qwen3-4b` / `ollama-llama3-2-3b` / `ollama-qwen3-8b` (stretch) / `groq-oss-20b` plus the registered local `prompt-guard-2` and offline `deberta-small`; `pricing.yaml` dated (Ollama = $0). CLI skeleton with `llm ping` (no flags = role `judge`, profile `local`). `live` / `hosted` / `models` opt-in pytest markers. README skeleton.
+- Verification: `uv run pytest -q` 154 passed, 2 skipped (opt-in); `-m live` ping passed against real Ollama (qwen3:4b-instruct, first call 20 s incl. model load, no API key set); ruff check + format and `mypy src` clean.
+- Local model tags present on the machine: `qwen3:4b-instruct`, `llama3.2:3b`, `qwen3:8b`. A typical-request timing (tokens/s) is recorded in M2.2 with the real judge prompt.
+**Files:** `pyproject.toml`, `.env.example`, `.gitignore`, `.gitattributes`, `configs/{models,pricing}.yaml`, `src/injection_bench/{__init__,config,cli}.py`, `src/injection_bench/llm/*`, `tests/**`.
+**Decisions:**
+- P01's eval runner is receipt-specific (scorer, tasks, report); only the LLM layer and settings were ported. The detector eval runner is written fresh for this task set (TRD §S4) in M1.3.
+- Gemini support stays in the ported provider layer but no Gemini alias is configured (not in this project's matrix).
+- `torch` / `transformers` are an optional extra (`uv sync --extra models`) so the base install stays light; B and C need them.
+- CLAUDE.md §1 updated: the human now allows commit + push on `test` only (same rule as P07).
+**Open:** Human action: `ollama pull` tags already present; HF token + Prompt Guard 2 licence before M1.3's B runs.
 
 ## 2026-10-23 — DOCS · Build local, benchmark hosted (v2.1)
 

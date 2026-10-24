@@ -1,0 +1,38 @@
+# Dated list prices (TRD §S3, §S5), keyed by the LiteLLM model string from models.yaml.
+#
+# Prices are USD per 1M tokens on the provider's paid tier. This project only uses free tiers,
+# so actual spend is $0; these prices give the comparable "list cost" in reports.
+# Quote every price as a string: money is Decimal, never float (CLAUDE.md §5).
+#
+# Each model has a list of entries; the entry in force on a call's (UTC) date is the latest one
+# whose effective_from is on or before that date. Dates before the first entry use the first.
+version: 1
+currency: USD
+models:
+  groq/openai/gpt-oss-20b:
+    - effective_from: 2026-10-19
+      input_per_mtok: "0.075"
+      output_per_mtok: "0.30"
+      source: https://console.groq.com/docs/models
+      checked: 2026-10-19
+
+  ollama_chat/qwen3:4b-instruct:
+    - effective_from: 2026-10-24
+      input_per_mtok: "0"
+      output_per_mtok: "0"
+      source: local (Ollama, CPU)
+      checked: 2026-10-24
+
+  ollama_chat/llama3.2:3b:
+    - effective_from: 2026-10-24
+      input_per_mtok: "0"
+      output_per_mtok: "0"
+      source: local (Ollama, CPU)
+      checked: 2026-10-24
+
+  ollama_chat/qwen3:8b:
+    - effective_from: 2026-10-24
+      input_per_mtok: "0"
+      output_per_mtok: "0"
+      source: local (Ollama, CPU)
+      checked: 2026-10-24

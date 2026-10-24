@@ -19,11 +19,13 @@ Project documentation: [PRD.md](PRD.md) · [TRD.md](TRD.md) · [APPFLOW.md](APPF
 
 These rules override the generic playbook wherever they are stricter.
 
-## 1. Git is read-only
+## 1. Git: commit and push on `test` only
 
-Allowed: `git status`, `log`, `diff`, `show`, `blame`. Forbidden: `init`, `add`, `commit`, `push`,
-`pull`, `branch`, `checkout -b`, `merge`, `rebase`, `reset`, `tag`, `stash`, any `config` change,
-and staging files "ready to commit". Do not offer to commit at the end of a task. The human handles git.
+Own repo; remote `origin` = https://github.com/Udai30/prompt-injection-detector; branches `main`
+(default), `dev`, `test`. After each task, once the gates pass and the WORKLOG entry exists, commit
+that task's changes on `test` (message `<Task ID>: <title>`) and `git push origin test`. Never commit
+or push on `main` or `dev`, never force-push, never rewrite history, never change git config. The
+human merges test → dev → main. Check `git status` first: no `.env`, `.cache/`, `runs/`, `data/`.
 
 ## 2. No database
 

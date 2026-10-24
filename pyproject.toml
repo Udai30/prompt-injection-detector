@@ -1,0 +1,111 @@
+[project]
+name = "injection-bench"
+version = "0.1.0"
+description = "Four prompt-injection detectors compared on catching attacks without blocking normal users, plus a published set of tricky benign prompts."
+readme = "README.md"
+authors = [
+    { name = "Udai30", email = "udaij30@gmail.com" }
+]
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "datasets>=4.0",
+    "gradio>=6.30,<7",
+    "huggingface-hub>=1.33",
+    "lingua-language-detector>=2.1",
+    "litellm>=1.106.0",
+    "matplotlib>=3.10",
+    "numpy>=2.5.4",
+    "pandas>=2.3",
+    "pyarrow>=21",
+    "pydantic>=2.8",
+    "pydantic-settings>=2.4",
+    "pyyaml>=6.0.3",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+# Local CPU inference for detectors B and C (weights are downloaded by explicit CLI commands).
+models = [
+    "torch>=2.8",
+    "transformers>=4.56",
+]
+
+[project.scripts]
+injection_bench = "injection_bench.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.16.2",
+    "hypothesis>=6.140",
+    "mypy>=2.4.0",
+    "pandas-stubs>=2.3",
+    "pip-audit>=2.10.1",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "ruff>=0.17.1",
+    "types-pyyaml>=6.0.12.20260906",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = ["*.md", ".claude"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF",
+    "S",    # bandit security checks
+    "PTH",  # pathlib over os.path (TRD §S9)
+    "DTZ",  # timezone-aware datetimes
+    "T20",  # no stray print()
+    "PL",
+]
+ignore = ["PLR0913"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004"]
+
+[tool.ruff.format]
+line-ending = "lf"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["pyarrow", "pyarrow.*", "lingua", "lingua.*", "datasets", "datasets.*", "transformers", "transformers.*", "torch", "torch.*"]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "live: calls a local Ollama server; opt-in with `-m live`",
+    "hosted: calls Groq; opt-in with `-m hosted`, skipped without GROQ_API_KEY",
+    "models: needs downloaded model weights; opt-in with `-m models`",
+]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["injection_bench"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

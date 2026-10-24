@@ -1,0 +1,70 @@
+# Model registry (TRD §3, §S3) — the ONLY place model strings may appear.
+#
+# kind:        chat | embedding  -> callable through injection_bench.llm (LiteLLM)
+#              local | offline   -> listed for completeness (Prompt Guard 2 and C run on CPU via
+#                                   transformers; the fine-tune runs on Kaggle); the LLM layer
+#                                   refuses to call them.
+# data_policy: any | public_only -> public_only aliases accept only requests whose data_origin is
+#              "public_dataset" or "synthetic" (none here: Gemini is not in this project's matrix).
+# limits:      free-plan limits per alias (requests/tokens per minute and per day). The layer paces
+#              itself with these so a sweep pauses instead of hitting 429s. Re-check them in the
+#              provider console before a sweep; record changes in WORKLOG.
+# profiles:    role -> alias per profile (TRD §S10). Code asks for a role, never an alias.
+#              LLM_PROFILE=local is the build default; `hosted` is for benchmark runs and the Space.
+version: 1
+
+profiles:
+  local:
+    judge: ollama-qwen3-4b
+  hosted:
+    judge: groq-oss-20b
+
+models:
+  # Local chat model on the laptop CPU (Ollama; nothing leaves the machine, no rate limits).
+  # The non-thinking instruct build. ollama_chat/ = the chat route. num_ctx covers the judge
+  # prompt (~400 tokens) + a 2,000-char candidate + a short JSON reply, with headroom.
+  # `ollama pull qwen3:4b-instruct` first.
+  ollama-qwen3-4b:
+    provider: ollama
+    kind: chat
+    model: ollama_chat/qwen3:4b-instruct
+    data_policy: any
+    options: { num_ctx: 4096, keep_alive: 30m }
+
+  # Second local model; fallback if the 4B is too slow. `ollama pull llama3.2:3b`.
+  ollama-llama3-2-3b:
+    provider: ollama
+    kind: chat
+    model: ollama_chat/llama3.2:3b
+    data_policy: any
+    options: { num_ctx: 4096, keep_alive: 30m }
+
+  # Overnight stretch comparison only (~2x slower than the 4B; close other apps).
+  ollama-qwen3-8b:
+    provider: ollama
+    kind: chat
+    model: ollama_chat/qwen3:8b
+    data_policy: any
+    options: { num_ctx: 4096, keep_alive: 30m }
+
+  # Hosted: benchmark rows (MB.1) and the Space only; never needed to build.
+  groq-oss-20b:
+    provider: groq
+    kind: chat
+    model: groq/openai/gpt-oss-20b
+    context_window: 131072
+    max_output_tokens: 65536
+    data_policy: any
+    limits: { rpm: 30, tpm: 8000, rpd: 1000, tpd: 200000 }
+    limits_checked: 2026-10-19
+    source: https://console.groq.com/docs/rate-limits
+
+  prompt-guard-2:
+    provider: local
+    kind: local
+    model: meta-llama/Llama-Prompt-Guard-2-86M
+
+  deberta-small:
+    provider: kaggle
+    kind: offline
+    model: microsoft/deberta-v3-small
