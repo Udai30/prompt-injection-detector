@@ -1,0 +1,84 @@
+# Detector A: rule list (FR-3). Each rule: id, pattern (Python regex, matched case-insensitively
+# with re.search), note. Patterns stay simple on purpose (no nested quantifiers: linear time).
+# Rules were written from the attack *shapes* in the public literature, before any detector ran on
+# the hard negatives; they are NOT tuned on the test split or the hard negatives. A rule change is
+# a new rules version, recorded in WORKLOG.
+version: 2
+# v2 (2026-10-24): added after reading validation misses only (never test or hard negatives):
+# praise-then-new-task, German/Spanish 'ignore/forget', 'what is written above', 'attention - stop'.
+rules:
+  - id: ignore_previous
+    pattern: '\b(ignore|disregard|forget|skip|override)\b[^.\n]{0,40}\b(previous|prior|above|earlier|preceding|all|any|your)\b[^.\n]{0,30}\b(instructions?|prompts?|rules?|directions?|guidelines?|context|messages?)\b'
+    note: 'classic "ignore previous instructions" family'
+  - id: forget_everything
+    pattern: '\b(forget|ignore|disregard)\s+(everything|all)\b'
+    note: '"forget everything" / "ignore all" resets'
+  - id: new_instructions
+    pattern: '\b(new|updated|revised|following)\s+instructions?\b\s*[:\-]'
+    note: 'announces replacement instructions'
+  - id: you_are_now
+    pattern: '\byou\s+are\s+now\b'
+    note: 'identity reassignment'
+  - id: from_now_on
+    pattern: '\bfrom\s+now\s+on\b[^.\n]{0,60}\b(you|your|answer|respond|act|only)\b'
+    note: 'persistent behaviour change'
+  - id: act_as_unrestricted
+    pattern: '\b(act|behave|respond)\s+(as|like)\b[^.\n]{0,60}\b(unrestricted|unfiltered|uncensored|without\s+(any\s+)?(restrictions?|rules|limits|filters?))\b'
+    note: 'persona that removes restrictions'
+  - id: pretend_no_rules
+    pattern: '\bpretend\b[^.\n]{0,60}\b(no\s+(rules|restrictions|limits)|not\s+an?\s+(ai|assistant)|without\s+restrictions)\b'
+    note: 'pretend the rules do not apply'
+  - id: reveal_system_prompt
+    pattern: '\b(reveal|show|print|repeat|output|tell\s+me|leak|display)\b[^.\n]{0,40}\b(system\s+prompt|initial\s+prompt|hidden\s+(instructions?|prompt)|your\s+instructions)\b'
+    note: 'prompt extraction'
+  - id: developer_mode
+    pattern: '\b(developer|debug|god|admin|dan|jailbreak(ed)?)\s+mode\b'
+    note: 'mode-switch jailbreaks'
+  - id: do_anything_now
+    pattern: '\bdo\s+anything\s+now\b'
+    note: 'DAN family'
+  - id: role_marker
+    pattern: '(^|\n)\s*(system|assistant|developer)\s*:\s*\S'
+    note: 'fake chat-role marker at line start'
+  - id: delimiter_close
+    pattern: '(</?(system|instructions?)>|\[/?(inst|system)\]|<\|im_(start|end)\|>)'
+    note: 'chat-template or tag injection'
+  - id: base64_blob
+    pattern: '[A-Za-z0-9+/]{60,}={0,2}'
+    note: 'long base64-like blob (hidden payload)'
+  - id: stop_then_command
+    pattern: '\b(stop|halt)\b\s*[.!:]?\s*(now\s+)?(ignore|forget|instead|new)\b'
+    note: 'interruption then new command'
+  - id: instead_do
+    pattern: '\b(instead|rather)\b[^.\n]{0,30}\b(of\s+)?(that|this|the\s+task)\b[^.\n]{0,30}\b(say|write|print|output|do)\b'
+    note: 'redirects the task'
+  - id: de_ignore_previous
+    pattern: '\b(ignorier\w*|vergiss\w*|missachte\w*|übergehe\w*|ubergehe\w*)\b[^.\n]{0,50}\b(alle[ns]?|vorherige\w*|obige\w*|bisherige\w*|anweisung\w*|instruktion\w*|regeln|befehle?)\b'
+    note: 'German "ignore/forget previous instructions"'
+  - id: de_new_instructions
+    pattern: '\b(neue|folgende|aktualisierte)\s+(anweisung\w*|instruktion\w*|aufgabe\w*)\b\s*[:\-]'
+    note: 'German replacement instructions'
+  - id: de_you_are_now
+    pattern: '\bdu\s+bist\s+(jetzt|nun|ab\s+sofort)\b|\bab\s+jetzt\s+(bist|musst|sollst)\s+du\b|\btu\s+so\s+als\b'
+    note: 'German identity reassignment / pretend'
+  - id: de_stop_new_task
+    pattern: '\b(stopp?|halt|ende)\b[^.\n]{0,20}\b(neue\s+aufgabe|neue\s+anweisung|jetzt\s+(sag|schreib|gib))\b'
+    note: 'German interruption + new task'
+  - id: praise_then_task
+    pattern: '\b(well\s+done|great\s+job|simply\s+great|excellent\s+work|ausgezeichnete\s+leistung|gut\s+gemacht|sehr\s+gut)\b[^\n]{0,80}\b(now|another\s+task|new\s+task|weitere\s+aufgaben|neue\s+aufgabe|nun\s+folgen|jetzt)\b'
+    note: 'flattery followed by a new task (a common deepset attack shape)'
+  - id: de_ignore_infinitive
+    pattern: '\b(ignorieren|vergessen|missachten|hinter\s+sich\s+lassen|hinter\s+sich)\b[^.\n]{0,40}\b(alle\w*|vorherige\w*|obige\w*|bisherige\w*|informationen|anweisungen)\b|\b(obigen|vorherigen|bisherigen)\b[^.\n]{0,40}\b(ignorieren|vergessen)\b'
+    note: 'German infinitive forms such as "die obigen Ausfuehrungen ignorieren"'
+  - id: es_forget
+    pattern: '\b(olvid\w+|ignor[ae]\w*)\b[^.\n]{0,30}\b(todo|todas|instrucciones|anteriores)\b'
+    note: 'Spanish "forget everything / all instructions"'
+  - id: what_is_written_above
+    pattern: '\b(what\s+(is|was)\s+written\s+above|was\s+steht\s+oben|repeat\s+(everything|the\s+text)\s+above)\b'
+    note: 'extracts the text above the user turn'
+  - id: attention_stop
+    pattern: '\b(attention|achtung)\b\s*[-:!]?\s*(stop|stopp)\b'
+    note: '"Attention - stop" interruption'
+  - id: do_not_look_in_documents
+    pattern: '\bdo\s+not\s+look\s+(in|at)\s+the\s+(documents?|context|provided)\b'
+    note: 'tells the model to disregard retrieved documents'

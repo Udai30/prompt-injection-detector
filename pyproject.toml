@@ -54,7 +54,8 @@ dev = [
 line-length = 100
 target-version = "py312"
 src = ["src", "tests"]
-extend-exclude = ["*.md", ".claude"]
+# notebooks/*.ipynb: generated Kaggle notebook (prints and asserts are its progress output).
+extend-exclude = ["*.md", ".claude", "notebooks/*.ipynb"]
 
 [tool.ruff.lint]
 select = [
@@ -65,7 +66,7 @@ select = [
     "T20",  # no stray print()
     "PL",
 ]
-ignore = ["PLR0913"]
+ignore = ["PLR0913", "PLR0917"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "PLR2004"]

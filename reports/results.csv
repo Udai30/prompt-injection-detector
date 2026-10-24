@@ -1,0 +1,31 @@
+run_id,detector,variant,subset,hn_status,threshold,n,n_attacks,n_benign,recall,recall_ci,fpr,fpr_ci,precision,f1,latency_p50_ms,latency_p95_ms,list_cost_per_1k_usd,n_errors
+A-validation-f162d9adfb,A,rules-v2,validation,n/a,,81,30,51,0.733,"[0.565, 0.885]",0.000,"[0.000, 0.000]",1.000,0.846,0.0,0.2,0.0000,0
+A-validation-f162d9adfb,A,rules-v2 [de],validation,n/a,,40,12,28,0.667,"[0.364, 0.917]",0.000,"[0.000, 0.000]",1.000,0.800,0.0,0.2,0.0000,0
+A-validation-f162d9adfb,A,rules-v2 [en],validation,n/a,,38,15,23,0.733,"[0.500, 0.933]",0.000,"[0.000, 0.000]",1.000,0.846,0.0,0.2,0.0000,0
+A-validation-f162d9adfb,A,rules-v2 [other],validation,n/a,,3,3,0,1.000,"[1.000, 1.000]",,,1.000,1.000,0.0,0.2,0.0000,0
+A-test-7aa4eea1c1,A,rules-v2,test,n/a,,116,60,56,0.300,"[0.187, 0.419]",0.000,"[0.000, 0.000]",1.000,0.462,0.0,0.2,0.0000,0
+A-test-7aa4eea1c1,A,rules-v2 [de],test,n/a,,48,21,27,0.333,"[0.143, 0.550]",0.000,"[0.000, 0.000]",1.000,0.500,0.0,0.2,0.0000,0
+A-test-7aa4eea1c1,A,rules-v2 [en],test,n/a,,66,37,29,0.270,"[0.133, 0.415]",0.000,"[0.000, 0.000]",1.000,0.426,0.0,0.2,0.0000,0
+A-test-7aa4eea1c1,A,rules-v2 [other],test,n/a,,2,2,0,0.500,"[0.000, 1.000]",,,1.000,0.667,0.0,0.2,0.0000,0
+A-hard_negative-0f0ddd42f2,A,rules-v2,hard_negative,draft,,160,0,160,,,0.100,"[0.056, 0.150]",,,0.1,0.1,0.0000,0
+A-hard_negative-0f0ddd42f2,A,rules-v2 [en],hard_negative,draft,,160,0,160,,,0.100,"[0.056, 0.150]",,,0.1,0.1,0.0000,0
+B-validation-97be8c23fe,B,protectai-deberta,validation,n/a,,81,30,51,0.567,"[0.394, 0.743]",0.000,"[0.000, 0.000]",1.000,0.723,171.6,300.3,0.0000,0
+B-validation-97be8c23fe,B,protectai-deberta [de],validation,n/a,,40,12,28,0.500,"[0.200, 0.818]",0.000,"[0.000, 0.000]",1.000,0.667,171.6,300.3,0.0000,0
+B-validation-97be8c23fe,B,protectai-deberta [en],validation,n/a,,38,15,23,0.533,"[0.278, 0.786]",0.000,"[0.000, 0.000]",1.000,0.696,171.6,300.3,0.0000,0
+B-validation-97be8c23fe,B,protectai-deberta [other],validation,n/a,,3,3,0,1.000,"[1.000, 1.000]",,,1.000,1.000,171.6,300.3,0.0000,0
+B-test-2f2531add7,B,protectai-deberta,test,n/a,,116,60,56,0.367,"[0.246, 0.491]",0.000,"[0.000, 0.000]",1.000,0.537,164.6,323.6,0.0000,0
+B-test-2f2531add7,B,protectai-deberta [de],test,n/a,,48,21,27,0.476,"[0.263, 0.706]",0.000,"[0.000, 0.000]",1.000,0.645,164.6,323.6,0.0000,0
+B-test-2f2531add7,B,protectai-deberta [en],test,n/a,,66,37,29,0.270,"[0.125, 0.429]",0.000,"[0.000, 0.000]",1.000,0.426,164.6,323.6,0.0000,0
+B-test-2f2531add7,B,protectai-deberta [other],test,n/a,,2,2,0,1.000,"[1.000, 1.000]",,,1.000,1.000,164.6,323.6,0.0000,0
+B-hard_negative-865e5cea8d,B,protectai-deberta,hard_negative,draft,,160,0,160,,,0.362,"[0.287, 0.438]",,,159.9,263.7,0.0000,0
+B-hard_negative-865e5cea8d,B,protectai-deberta [en],hard_negative,draft,,160,0,160,,,0.362,"[0.287, 0.438]",,,159.9,263.7,0.0000,0
+D-validation-e08fb7e6de,D,ollama-qwen3-4b/judge-v1,validation,n/a,,81,30,51,0.633,"[0.458, 0.800]",0.000,"[0.000, 0.000]",1.000,0.776,6923.0,9986.1,0.0000,0
+D-validation-e08fb7e6de,D,ollama-qwen3-4b/judge-v1 [de],validation,n/a,,40,12,28,0.667,"[0.364, 0.917]",0.000,"[0.000, 0.000]",1.000,0.800,6923.0,9986.1,0.0000,0
+D-validation-e08fb7e6de,D,ollama-qwen3-4b/judge-v1 [en],validation,n/a,,38,15,23,0.533,"[0.286, 0.786]",0.000,"[0.000, 0.000]",1.000,0.696,6923.0,9986.1,0.0000,0
+D-validation-e08fb7e6de,D,ollama-qwen3-4b/judge-v1 [other],validation,n/a,,3,3,0,1.000,"[1.000, 1.000]",,,1.000,1.000,6923.0,9986.1,0.0000,0
+D-test-8d1784f3bc,D,ollama-qwen3-4b/judge-v1,test,n/a,,116,60,56,0.317,"[0.203, 0.436]",0.000,"[0.000, 0.000]",1.000,0.481,6380.6,9266.2,0.0000,0
+D-test-8d1784f3bc,D,ollama-qwen3-4b/judge-v1 [de],test,n/a,,48,21,27,0.333,"[0.130, 0.542]",0.000,"[0.000, 0.000]",1.000,0.500,6380.6,9266.2,0.0000,0
+D-test-8d1784f3bc,D,ollama-qwen3-4b/judge-v1 [en],test,n/a,,66,37,29,0.297,"[0.156, 0.447]",0.000,"[0.000, 0.000]",1.000,0.458,6380.6,9266.2,0.0000,0
+D-test-8d1784f3bc,D,ollama-qwen3-4b/judge-v1 [other],test,n/a,,2,2,0,0.500,"[0.000, 1.000]",,,1.000,0.667,6380.6,9266.2,0.0000,0
+D-hard_negative-dedecd75c7,D,ollama-qwen3-4b/judge-v1,hard_negative,draft,,160,0,160,,,0.056,"[0.025, 0.094]",,,6406.0,8643.8,0.0000,0
+D-hard_negative-dedecd75c7,D,ollama-qwen3-4b/judge-v1 [en],hard_negative,draft,,160,0,160,,,0.056,"[0.025, 0.094]",,,6406.0,8643.8,0.0000,0

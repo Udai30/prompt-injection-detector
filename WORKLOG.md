@@ -32,7 +32,7 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 
 | Item | Value |
 |---|---|
-| Current task | M1.3 — in progress |
+| Current task | M3.2 — Gradio app (next); human actions pending |
 | Last verified gate run | — |
 | Pending human actions | see the entries below |
 
@@ -70,6 +70,29 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 - Console output stays ASCII (Windows cp1252 consoles crash on `≥`).
 **Open:**
 - **Human action (the slow, valuable part):** read `data_own/hard_negatives.draft.jsonl`; reject, edit and add rows; move accepted rows into `data_own/hard_negatives.jsonl` with `author: udai`; run `uv run injection_bench hn validate` and `hn coverage`. M1.2 is not "done" until >= 150 human-accepted prompts exist. Until then all hard-negative FPR numbers are provisional.
+
+## 2026-10-24 — M1.3 / M2.1 / M2.2 / M3.1 (code) · Detectors A, B, D, C pipeline, harness and sweep
+
+**Done:** Detector protocol and `Verdict`; eval runner (resumable, `results.jsonl`/`summary.json`/`manifest.json`), metrics with 95 % bootstrap CIs and per-language blocks, report builder, `eval run`, `report build`, `report sweep`, `import-predictions`, `models download`.
+- **A** rules v2 (25 rules, `configs/rules.yaml`); v2 added rules after reading *validation* misses only. **B** wrapper over `transformers` (512-token chunks, max score). **D** judge `judge-v1` on role `judge` (local `ollama-qwen3-4b`). **C**: Kaggle notebook `notebooks/finetune_injection.ipynb` (asserts split id hashes), importer, validation-only threshold sweep + chart code (tested on synthetic scores).
+- Runs (all provisional on hard negatives = agent DRAFT set; test is n=116):
+
+| Det | validation recall | test recall [CI] | HN-draft FPR | p50 latency |
+|---|---|---|---|---|
+| A rules-v2 | 0.73 (tuned on it) | 0.30 [0.19, 0.42] | 0.100 | < 1 ms |
+| B protectai-deberta (stand-in) | 0.57 | 0.37 [0.25, 0.49] | 0.363 | ~165 ms |
+| D qwen3:4b-instruct, judge-v1 | 0.63 | 0.32 [0.20, 0.44] | 0.056 | ~6.4 s |
+
+  All FPR on benign deepset prompts = 0 for A/B/D. Validation-to-test drop for A shows validation overfit.
+- Verification: 223 tests pass (2 opt-in skipped); ruff and mypy clean.
+**Files:** `src/injection_bench/{detectors,eval}/*`, `configs/rules.yaml`, `notebooks/*`, `tests/unit/{detectors,eval}/*`, `reports/results.{csv,md}`, `README.md`.
+**Decisions:**
+- B ran on the **ungated stand-in** `protectai/deberta-v3-base-prompt-injection-v2` (Prompt Guard 2 is gated, no HF token): logged swap per TRD §3. Its high HN false-positive rate is a finding, not final.
+- D latency was measured while other work ran on the CPU in the first ~third of the run; re-time idle before quoting it.
+- `llm_calls.jsonl` is one file at `runs/` (not per run).
+**Open:**
+- Human action: accept the hard negatives; HF token + Prompt Guard 2 licence then `models download prompt-guard-2` and `eval run -d B`; run the Kaggle notebook, `import-predictions`, local `eval run -d C --c-path`, then `report sweep`.
+- Not yet built: M3.2 Gradio app/DEPLOY.md, MB.1 hosted run (needs Groq key), MF.1 final README numbers.
 
 ## 2026-10-23 — DOCS · Build local, benchmark hosted (v2.1)
 
