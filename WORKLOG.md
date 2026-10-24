@@ -32,7 +32,7 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 
 | Item | Value |
 |---|---|
-| Current task | M3.2 — Gradio app (next); human actions pending |
+| Current task | Waiting on human actions (hard negatives, Kaggle C, HF token) |
 | Last verified gate run | — |
 | Pending human actions | see the entries below |
 
@@ -93,6 +93,13 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 **Open:**
 - Human action: accept the hard negatives; HF token + Prompt Guard 2 licence then `models download prompt-guard-2` and `eval run -d B`; run the Kaggle notebook, `import-predictions`, local `eval run -d C --c-path`, then `report sweep`.
 - Not yet built: M3.2 Gradio app/DEPLOY.md, MB.1 hosted run (needs Groq key), MF.1 final README numbers.
+
+## 2026-10-24 — M3.2 · Gradio app and deploy notes (local)
+
+**Done:** `ui/service.py` (input cap 2,000 chars, per-detector failure isolation, no text logged or leaked in errors, detectors built once), `ui/app.py` (tabs: Results, Try it, Hard negatives, About; queue limits), `app.py` entry, `docs/DEPLOY.md`. Smoke: `python app.py` served HTTP 200 locally. 227 tests pass; ruff + mypy clean.
+**Files:** `src/injection_bench/ui/*`, `app.py`, `docs/DEPLOY.md`, `tests/unit/ui/*`.
+**Decisions:** Demo B currently uses the stand-in; switch to Prompt Guard 2 once downloaded. `DEMO_MODE` daily budget/cached fallback is NOT implemented yet (banner only).
+**Open:** Build-complete checkpoint NOT reached: needs C (Kaggle), accepted hard negatives, Prompt Guard 2, DEMO_MODE budget, a manual UI check of "Try it" with Ollama running. Human action: publish steps in DEPLOY.md.
 
 ## 2026-10-23 — DOCS · Build local, benchmark hosted (v2.1)
 
