@@ -56,14 +56,18 @@ def default_factories(settings: Settings, c_path: Path | None = None) -> dict[st
 
     return {
         "A: rules": make("A"),
-        "B: Prompt Guard 2": make("B", model="protectai-deberta"),
+        "B: classifier (stand-in)": make("B", model="protectai-deberta"),
         "C: fine-tuned": make("C", c_path=c_path),
         "D: LLM judge": make("D"),
     }
 
 
 def check(
-    text: str, factories: dict[str, DetectorFactory], cache: dict[str, Detector] | None = None
+    text: str,
+    factories: dict[str, DetectorFactory],
+    cache: dict[str, Detector] | None = None,
+    live_gate: Callable[[], bool] | None = None,
+    gated: frozenset[str] = frozenset({"D: LLM judge"}),
 ) -> tuple[list[Row], str]:
     """Run every detector on ``text``; returns the rows and a short request id."""
     cleaned = validate(text)
@@ -71,6 +75,11 @@ def check(
     rows: list[Row] = []
     store = cache if cache is not None else {}
     for name, factory in factories.items():
+        if live_gate is not None and name in gated and not live_gate():
+            rows.append(
+                Row(name, "limit reached", "-", "-", "Daily cap on live LLM-judge checks is spent.")
+            )
+            continue
         try:
             if name not in store:
                 store[name] = factory()

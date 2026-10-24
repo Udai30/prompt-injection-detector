@@ -29,6 +29,7 @@ def build_detector(
     provider: Provider | None = None,
     rules_path: Path | None = None,
     run_dir: Path | None = None,
+    use_cache: bool = True,
 ) -> tuple[Detector, str]:
     """Return ``(detector, variant label)``.
 
@@ -73,6 +74,6 @@ def build_detector(
     from injection_bench.llm import JSONLSink, build_client  # noqa: PLC0415
 
     sinks = [JSONLSink(run_dir / "llm_calls.jsonl")] if run_dir else []
-    client = build_client(settings, cache=True, sinks=sinks, provider=provider)
+    client = build_client(settings, cache=use_cache, sinks=sinks, provider=provider)
     alias = model or client.registry.resolve("judge", settings.llm_profile)
     return LLMJudge(client, alias), f"{alias}/{PROMPT_VERSION}"

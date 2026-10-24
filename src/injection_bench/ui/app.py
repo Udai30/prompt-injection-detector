@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import csv
 import json
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -56,12 +57,19 @@ def _hard_negatives() -> list[list[str]]:
     return []
 
 
-def build(factories: dict[str, service.DetectorFactory], *, demo_mode: bool = False) -> Any:
+def build(
+    factories: dict[str, service.DetectorFactory],
+    *,
+    demo_mode: bool = False,
+    live_gate: Callable[[], bool] | None = None,
+) -> Any:
     cache: dict[str, Any] = {}
 
     def try_it(text: str) -> tuple[list[list[str]], str]:
         try:
-            rows, request_id = service.check(text, factories, cache)
+            rows, request_id = service.check(
+                text, factories, cache, live_gate if demo_mode else None
+            )
         except service.InputError as exc:
             return [], str(exc)
         return service.as_table(rows), f"request {request_id}"

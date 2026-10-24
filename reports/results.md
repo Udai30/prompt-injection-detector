@@ -11,8 +11,12 @@ Recall on deepset test/validation; FPR on the hard negatives (all benign) and on
 | B | protectai-deberta | validation | 81 | 0.567 [0.394, 0.743] | 0.000 [0.000, 0.000] | 1.000 | 0.723 | 171.6 | 300.3 | 0.0000 |
 | B | protectai-deberta | test | 116 | 0.367 [0.246, 0.491] | 0.000 [0.000, 0.000] | 1.000 | 0.537 | 164.6 | 323.6 | 0.0000 |
 | B | protectai-deberta | hard_negative (DRAFT set) | 160 | - | 0.362 [0.287, 0.438] | - | - | 159.9 | 263.7 | 0.0000 |
+| D | ollama-llama3-2-3b/judge-v1 | validation | 81 | 0.533 [0.357, 0.714] | 0.000 [0.000, 0.000] | 1.000 | 0.696 | 3154.8 | 5484.3 | 0.0000 |
+| D | ollama-llama3-2-3b/judge-v1 | test | 116 | 0.183 [0.088, 0.288] | 0.000 [0.000, 0.000] | 1.000 | 0.310 | 3616.8 | 6199.8 | 0.0000 |
+| D | ollama-llama3-2-3b/judge-v1 | hard_negative (DRAFT set) | 160 | - | 0.013 [0.000, 0.031] | - | - | 3547.8 | 4236.6 | 0.0000 |
 | D | ollama-qwen3-4b/judge-v1 | validation | 81 | 0.633 [0.458, 0.800] | 0.000 [0.000, 0.000] | 1.000 | 0.776 | 6923.0 | 9986.1 | 0.0000 |
 | D | ollama-qwen3-4b/judge-v1 | test | 116 | 0.317 [0.203, 0.436] | 0.000 [0.000, 0.000] | 1.000 | 0.481 | 6380.6 | 9266.2 | 0.0000 |
 | D | ollama-qwen3-4b/judge-v1 | hard_negative (DRAFT set) | 160 | - | 0.056 [0.025, 0.094] | - | - | 6406.0 | 8643.8 | 0.0000 |
+| D | ollama-qwen3-4b/judge-v1 (timing, no cache) | test | 30 | 0.500 [0.200, 0.819] | 0.000 [0.000, 0.000] | 1.000 | 0.667 | 4501.4 | 6646.1 | 0.0000 |
 
 Rows marked DRAFT use the agent-drafted hard-negative candidates, not the human-accepted set: provisional, not for the README.

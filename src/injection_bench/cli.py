@@ -245,6 +245,9 @@ def eval_run(
         Path | None, typer.Option("--c-path", help="C: directory of the fine-tuned model.")
     ] = None,
     limit: Annotated[int | None, typer.Option(help="Only the first N cases (smoke runs).")] = None,
+    no_cache: Annotated[
+        bool, typer.Option("--no-cache", help="D: bypass the response cache (latency timing).")
+    ] = False,
 ) -> None:
     """Run DETECTOR over the chosen subsets (default: validation, test, hard_negative)."""
     from injection_bench.config import ConfigError, get_settings  # noqa: PLC0415
@@ -283,8 +286,16 @@ def eval_run(
                 c_path=c_path,
                 provider=_provider_factory(),
                 run_dir=RUNS_DIR,
+                use_cache=not no_cache,
             )
             config = config.model_copy(update={"variant": variant})
+            if no_cache:
+                config = config.model_copy(
+                    update={
+                        "params": {"no_cache": True},
+                        "variant": variant + " (timing, no cache)",
+                    }
+                )
             typer.echo(
                 f"{variant} on {name} ({hn_status if name == 'hard_negative' else 'deepset'})"
             )
@@ -450,6 +461,26 @@ def report_sweep(
         f"validation recall={chosen.recall} fpr={chosen.fpr}; test recall={at_test.recall} "
         f"fpr={at_test.fpr}"
     )
+
+
+@app.command("failures")
+def failures() -> None:
+    """Export misses and false alarms of all finished runs to reports/failures.csv for labelling."""
+    from injection_bench.config import ConfigError, get_settings  # noqa: PLC0415
+    from injection_bench.data import hard_negatives as hn  # noqa: PLC0415
+    from injection_bench.eval import failures as fail  # noqa: PLC0415
+
+    try:
+        data_dir = get_settings().data_dir
+        cases = {name: {c.id: c for c in _load_cases(data_dir, name)[0]} for name in SUBSETS}
+        path, _ = hn.resolve_path(HN_DIR)
+        categories = {r.id: r.category for r in hn.load(path)[0]}
+    except (ConfigError, FileNotFoundError, ValueError) as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(code=1) from None
+    rows = fail.collect(RUNS_DIR, cases, categories)
+    fail.write_csv(rows, REPORTS_DIR / "failures.csv")
+    typer.echo(f"wrote {len(rows)} failure rows to {REPORTS_DIR / 'failures.csv'}")
 
 
 @report_app.command("build")

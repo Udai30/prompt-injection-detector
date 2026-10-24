@@ -64,3 +64,26 @@ def test_detectors_are_built_once_and_reused() -> None:
 def test_app_builds_and_the_try_it_callback_reports_input_errors() -> None:
     demo = app.build({"A": Fixed})
     assert demo is not None
+
+
+def test_gated_detector_shows_a_limit_row_without_being_built() -> None:
+    built: list[int] = []
+
+    def judge() -> Fixed:
+        built.append(1)
+        return Fixed()
+
+    rows, _ = service.check("t", {"A": Fixed, "D: LLM judge": judge}, live_gate=lambda: False)
+    assert rows[0].verdict == "INJECTION" and rows[1].verdict == "limit reached" and not built
+
+
+def test_daily_budget_counts_per_day_and_fails_closed(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    from injection_bench.ui.budget import DailyBudget  # noqa: PLC0415
+
+    day = ["2026-10-24"]
+    budget = DailyBudget(tmp_path / "b.json", 2, today=lambda: day[0])
+    assert [budget.try_acquire() for _ in range(3)] == [True, True, False]
+    day[0] = "2026-10-25"
+    assert budget.try_acquire()
+    (tmp_path / "b.json").write_text("garbage", encoding="utf-8")
+    assert not budget.try_acquire()

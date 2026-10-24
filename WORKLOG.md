@@ -101,6 +101,20 @@ Format: **newest first**, one entry per task session (see CLAUDE.md §7).
 **Decisions:** Demo B currently uses the stand-in; switch to Prompt Guard 2 once downloaded. `DEMO_MODE` daily budget/cached fallback is NOT implemented yet (banner only).
 **Open:** Build-complete checkpoint NOT reached: needs C (Kaggle), accepted hard negatives, Prompt Guard 2, DEMO_MODE budget, a manual UI check of "Try it" with Ollama running. Human action: publish steps in DEPLOY.md.
 
+## 2026-10-24 — M3.x follow-ups · timing, demo budget, failures, second local judge
+
+**Done:**
+- `eval run --no-cache` and an idle-machine D timing run (30 uncached test cases, `qwen3:4b-instruct`): **p50 4.5 s, p95 6.6 s** (the earlier 6.4 s p50 was measured partly under load; that run's cached rows stay as they are, the timing run is labelled "(timing, no cache)").
+- `ui/budget.py`: per-UTC-day cap on live judge checks (`DEMO_DAILY_REQUESTS`) used when `DEMO_MODE=true`; fails closed on unreadable state; tests added. Limit row replaces the judge row when spent (no cached-showcase fallback yet).
+- `injection_bench failures` -> `reports/failures.csv` (241 rows, draft heuristic labels) and `reports/failure_notes.md`; 33 cases missed by every detector.
+- Browser check of "Try it" in the pane: attack prompt -> A, B, D flag it, C "unavailable" (not trained), no stack traces; B row relabelled "classifier (stand-in)".
+- Second local judge row, `llama3.2:3b`, judge-v1: validation recall 0.53, test recall 0.18, hard-negative (draft) FPR 0.013, p50 ~3.5 s (run while idle). Smaller model = fewer false alarms, fewer catches.
+- Drafts: `docs/MODEL_CARD_DRAFT.md`, `docs/LINKEDIN_DRAFT.md` (numbers bracketed).
+- Verification: tests, ruff, mypy pass.
+**Files:** `src/injection_bench/{ui/budget.py,eval/failures.py,cli.py,detectors/factory.py,ui/*}`, `reports/*`, `docs/*`, `tests/unit/{ui,eval}/*`.
+**Decisions:** llama3.2 numbers are provisional on the draft hard-negative set like all FPR figures.
+**Open:** unchanged human actions (accept hard negatives; HF token + Prompt Guard 2; Kaggle C; publish). README results table still not filled: waits for accepted hard negatives.
+
 ## 2026-10-23 — DOCS · Build local, benchmark hosted (v2.1)
 
 **Done:** Re-architected the LLM access for the build (human request, 2026-10-23: "build the app first
